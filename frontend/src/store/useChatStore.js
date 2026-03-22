@@ -3,6 +3,18 @@ import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
 import { useAuthStore } from "./useAuthStore";
 
+const handleRequestError = (error, fallbackMessage = "Something went wrong") => {
+  if (error.response?.status === 401) {
+    useAuthStore.getState().clearAuth({
+      notify: true,
+      message: "Your session is not available. Please log in again.",
+    });
+    return;
+  }
+
+  toast.error(error.response?.data?.message || fallbackMessage);
+};
+
 export const useChatStore = create((set, get) => ({
   allContacts: [],
   chats: [],
@@ -27,7 +39,7 @@ export const useChatStore = create((set, get) => ({
       const res = await axiosInstance.get("/messages/contacts");
       set({ allContacts: res.data });
     } catch (error) {
-      toast.error(error.response.data.message);
+      handleRequestError(error, "Unable to load contacts");
     } finally {
       set({ isUsersLoading: false });
     }
@@ -38,7 +50,7 @@ export const useChatStore = create((set, get) => ({
       const res = await axiosInstance.get("/messages/chats");
       set({ chats: res.data });
     } catch (error) {
-      toast.error(error.response.data.message);
+      handleRequestError(error, "Unable to load chats");
     } finally {
       set({ isUsersLoading: false });
     }
@@ -50,7 +62,7 @@ export const useChatStore = create((set, get) => ({
       const res = await axiosInstance.get(`/messages/${userId}`);
       set({ messages: res.data });
     } catch (error) {
-      toast.error(error.response?.data?.message || "Something went wrong");
+      handleRequestError(error);
     } finally {
       set({ isMessagesLoading: false });
     }
@@ -80,7 +92,7 @@ export const useChatStore = create((set, get) => ({
     } catch (error) {
       // remove optimistic message on failure
       set({ messages: messages });
-      toast.error(error.response?.data?.message || "Something went wrong");
+      handleRequestError(error);
     }
   },
 

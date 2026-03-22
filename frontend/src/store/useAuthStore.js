@@ -17,27 +17,55 @@ export const useAuthStore = create((set, get) => ({
   socket: null,
   onlineUsers: [],
 
-  checkAuth: async () => {
+  clearAuth: ({ notify = false, message = "Session expired. Please log in again." } = {}) => {
+    const hadAuthUser = Boolean(get().authUser);
+
+    get().disconnectSocket();
+    set({ authUser: null, onlineUsers: [] });
+
+    if (notify && hadAuthUser) {
+      toast.error(message);
+    }
+  },
+
+  checkAuth: async ({ showLoader = true, silent = true } = {}) => {
+    if (showLoader) {
+      set({ isCheckingAuth: true });
+    }
+
     try {
       const res = await axiosInstance.get("/auth/check");
       set({ authUser: res.data });
       get().connectSocket();
+      return res.data;
     } catch (error) {
       console.log("Error in authCheck:", error);
-      set({ authUser: null });
+      get().clearAuth();
+
+      if (!silent) {
+        toast.error(error.response?.data?.message || "Unable to verify your session");
+      }
+
+      return null;
     } finally {
-      set({ isCheckingAuth: false });
+      if (showLoader) {
+        set({ isCheckingAuth: false });
+      }
     }
   },
 
   signup: async (data) => {
     set({ isSigningUp: true });
     try {
-      const res = await axiosInstance.post("/auth/signup", data);
-      set({ authUser: res.data });
+      await axiosInstance.post("/auth/signup", data);
+      const authUser = await get().checkAuth({ showLoader: false, silent: true });
+
+      if (!authUser) {
+        toast.error("Account created, but the session could not be verified");
+        return;
+      }
 
       toast.success("Account created successfully!");
-      get().connectSocket();
     } catch (error) {
       toast.error(error.response?.data?.message || "Signup failed");
     } finally {
@@ -48,12 +76,15 @@ export const useAuthStore = create((set, get) => ({
   login: async (data) => {
     set({ isLoggingIn: true });
     try {
-      const res = await axiosInstance.post("/auth/login", data);
-      set({ authUser: res.data });
+      await axiosInstance.post("/auth/login", data);
+      const authUser = await get().checkAuth({ showLoader: false, silent: true });
+
+      if (!authUser) {
+        toast.error("Login succeeded, but the session could not be verified");
+        return;
+      }
 
       toast.success("Logged in successfully");
-
-      get().connectSocket();
     } catch (error) {
       toast.error(error.response?.data?.message || "Login failed");
     } finally {
@@ -64,9 +95,8 @@ export const useAuthStore = create((set, get) => ({
   logout: async () => {
     try {
       await axiosInstance.post("/auth/logout");
-      set({ authUser: null });
+      get().clearAuth();
       toast.success("Logged out successfully");
-      get().disconnectSocket();
     } catch (error) {
       toast.error("Error logging out");
       console.log("Logout error:", error);
@@ -118,6 +148,13 @@ export const useAuthStore = create((set, get) => ({
   },
 
   disconnectSocket: () => {
-    if (get().socket?.connected) get().socket.disconnect();
+    const socket = get().socket;
+
+    if (socket) {
+      socket.off();
+      socket.disconnect();
+    }
+
+    set({ socket: null });
   },
 }));
