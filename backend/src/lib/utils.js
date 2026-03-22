@@ -1,6 +1,15 @@
 import jwt from "jsonwebtoken";
 import { ENV } from "./env.js";
 
+const isProduction = ENV.NODE_ENV === "production";
+
+export const getJwtCookieOptions = () => ({
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+  httpOnly: true,
+  sameSite: isProduction ? "none" : "strict",
+  secure: isProduction,
+});
+
 export const generateToken = (userId, res) => {
   const { JWT_SECRET } = ENV;
   if (!JWT_SECRET) {
@@ -11,15 +20,7 @@ export const generateToken = (userId, res) => {
     expiresIn: "7d",
   });
 
-  res.cookie("jwt", token, {
-    maxAge: 7 * 24 * 60 * 60 * 1000, // MS
-    httpOnly: true, // prevent XSS attacks: cross-site scripting
-    sameSite: "strict", // CSRF attacks
-    secure: ENV.NODE_ENV === "development" ? false : true,
-  });
+  res.cookie("jwt", token, getJwtCookieOptions());
 
   return token;
 };
-
-// http://localhost
-// https://dsmakmk.com

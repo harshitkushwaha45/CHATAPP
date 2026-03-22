@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { axiosInstance } from "../lib/axios";
+import { clearStoredAuthToken, getStoredAuthToken, storeAuthToken } from "../lib/auth";
 import toast from "react-hot-toast";
 import { io } from "socket.io-client";
 
@@ -20,6 +21,7 @@ export const useAuthStore = create((set, get) => ({
   clearAuth: ({ notify = false, message = "Session expired. Please log in again." } = {}) => {
     const hadAuthUser = Boolean(get().authUser);
 
+    clearStoredAuthToken();
     get().disconnectSocket();
     set({ authUser: null, onlineUsers: [] });
 
@@ -57,7 +59,8 @@ export const useAuthStore = create((set, get) => ({
   signup: async (data) => {
     set({ isSigningUp: true });
     try {
-      await axiosInstance.post("/auth/signup", data);
+      const res = await axiosInstance.post("/auth/signup", data);
+      storeAuthToken(res.data?.token);
       const authUser = await get().checkAuth({ showLoader: false, silent: true });
 
       if (!authUser) {
@@ -76,7 +79,8 @@ export const useAuthStore = create((set, get) => ({
   login: async (data) => {
     set({ isLoggingIn: true });
     try {
-      await axiosInstance.post("/auth/login", data);
+      const res = await axiosInstance.post("/auth/login", data);
+      storeAuthToken(res.data?.token);
       const authUser = await get().checkAuth({ showLoader: false, silent: true });
 
       if (!authUser) {
@@ -116,11 +120,13 @@ export const useAuthStore = create((set, get) => ({
 
   connectSocket: () => {
     const { authUser } = get();
+    const token = getStoredAuthToken();
 
     // ✅ prevent duplicate connection
     if (!authUser || get().socket?.connected) return;
 
     const socket = io(BASE_URL, {
+      auth: token ? { token } : undefined,
       withCredentials: true,
       transports: ["websocket"], // ✅ important for Render
     });

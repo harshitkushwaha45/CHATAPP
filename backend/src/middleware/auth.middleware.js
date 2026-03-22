@@ -2,9 +2,20 @@ import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 import { ENV } from "../lib/env.js";
 
+const getTokenFromRequest = (req) => {
+  if (req.cookies?.jwt) return req.cookies.jwt;
+
+  const authHeader = req.headers.authorization;
+  if (authHeader?.startsWith("Bearer ")) {
+    return authHeader.slice(7).trim();
+  }
+
+  return null;
+};
+
 export const protectRoute = async (req, res, next) => {
   try {
-    const token = req.cookies.jwt;
+    const token = getTokenFromRequest(req);
     if (!token) return res.status(401).json({ message: "Unauthorized - No token provided" });
 
     const decoded = jwt.verify(token, ENV.JWT_SECRET);
