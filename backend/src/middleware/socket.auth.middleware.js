@@ -4,40 +4,53 @@ import { ENV } from "../lib/env.js";
 
 export const socketAuthMiddleware = async (socket, next) => {
   try {
-    // extract token from http-only cookies
-    const token = socket.handshake.headers.cookie
-      ?.split("; ")
-      .find((row) => row.startsWith("jwt="))
-      ?.split("=")[1];
+    // ✅ 1. Try to get token from socket auth (BEST WAY)
+    let token = socket.handshake.auth?.token;
 
-    if (!token) {
-      console.log("Socket connection rejected: No token provided");
-      return next(new Error("Unauthorized - No Token Provided"));
+    // ✅ 2. Fallback: get token from cookies (if exists)
+    if (!token && socket.handshake.headers.cookie) {
+      const cookies = socket.handshake.headers.cookie
+        .split("; ")
+        .reduce((acc, cookie) => {
+          const [key, value] = cookie.split("=");
+          acc[key] = value;
+          return acc;
+        }, {});
+
+      token = cookies.jwt;
     }
 
-    // verify the token
+    // ❌ No token
+    if (!token) {
+      console.log("❌ Socket rejected: No token provided");
+      return next(new Error("Unauthorized - No Token"));
+    }
+
+    // ✅ 3. Verify token
     const decoded = jwt.verify(token, ENV.JWT_SECRET);
-    if (!decoded) {
-      console.log("Socket connection rejected: Invalid token");
+
+    if (!decoded?.userId) {
+      console.log("❌ Invalid token payload");
       return next(new Error("Unauthorized - Invalid Token"));
     }
 
-    // find the user fromdb
+    // ✅ 4. Get user from DB
     const user = await User.findById(decoded.userId).select("-password");
+
     if (!user) {
-      console.log("Socket connection rejected: User not found");
-      return next(new Error("User not found"));
+      console.log("❌ User not found");
+      return next(new Error("Unauthorized - User not found"));
     }
 
-    // attach user info to socket
+    // ✅ 5. Attach user to socket
     socket.user = user;
     socket.userId = user._id.toString();
 
-    console.log(`Socket authenticated for user: ${user.fullName} (${user._id})`);
+    console.log(`✅ Socket connected: ${user.fullName}`);
 
     next();
   } catch (error) {
-    console.log("Error in socket authentication:", error.message);
+    console.log("❌ Socket auth error:", error.message);
     next(new Error("Unauthorized - Authentication failed"));
   }
 };
