@@ -1,8 +1,11 @@
 import express from "express";
 import {
+  deleteMessageForEveryone,
+  editMessage,
   getAllContacts,
   getChatPartners,
   getMessagesByUserId,
+  markMessagesAsSeen,
   sendMessage,
 } from "../controllers/message.controller.js";
 import { protectRoute } from "../middleware/auth.middleware.js";
@@ -17,6 +20,9 @@ router.use(arcjetProtection, protectRoute);
 router.get("/contacts", getAllContacts);
 router.get("/chats", getChatPartners);
 router.get("/:id", getMessagesByUserId);
+router.patch("/delete-for-everyone/:id", deleteMessageForEveryone);
+router.patch("/edit/:id", editMessage);
+router.patch("/seen/:id", markMessagesAsSeen);
 router.post("/send/:id", sendMessage);
 
 export default router;

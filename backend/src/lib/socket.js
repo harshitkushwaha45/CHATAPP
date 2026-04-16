@@ -35,6 +35,28 @@ io.on("connection", (socket) => {
   io.emit("getOnlineUsers", Object.keys(userSocketMap));
 
   // with socket.on we listen for events from clients
+  socket.on("typing:start", ({ receiverId } = {}) => {
+    if (!receiverId || receiverId === userId) return;
+
+    const receiverSocketId = getReceiverSocketId(receiverId);
+    if (!receiverSocketId) return;
+
+    io.to(receiverSocketId).emit("typing:start", {
+      senderId: userId,
+    });
+  });
+
+  socket.on("typing:stop", ({ receiverId } = {}) => {
+    if (!receiverId || receiverId === userId) return;
+
+    const receiverSocketId = getReceiverSocketId(receiverId);
+    if (!receiverSocketId) return;
+
+    io.to(receiverSocketId).emit("typing:stop", {
+      senderId: userId,
+    });
+  });
+
   socket.on("disconnect", () => {
     console.log("A user disconnected", socket.user.fullName);
     delete userSocketMap[userId];
