@@ -49,40 +49,42 @@ function ChatContainer() {
   return (
     <>
       <ChatHeader />
-      <div className="flex-1 px-6 overflow-y-auto py-8">
+      <div className="flex-1 px-6 xl:px-10 overflow-y-auto py-8 xl:py-10">
         {messages.length > 0 && !isMessagesLoading ? (
-          <div className="max-w-3xl mx-auto space-y-6">
+          <div className="max-w-5xl mx-auto space-y-6">
             {messages.map((msg) => (
               <div
                 key={msg._id}
-                className={`chat ${msg.senderId === authUser._id ? "chat-end" : "chat-start"}`}
+                className={`chat group ${msg.senderId === authUser._id ? "chat-end" : "chat-start"}`}
               >
                 <div
                   className={`chat-bubble relative ${
                     msg.senderId === authUser._id
-                      ? "bg-cyan-600 text-white"
-                      : "bg-slate-800 text-slate-200"
+                      ? "bg-cyan-600 text-white shadow-[0_18px_40px_rgba(6,182,212,0.18)]"
+                      : "bg-slate-800 text-slate-200 shadow-[0_18px_36px_rgba(15,23,42,0.38)]"
                   }`}
                 >
                   {msg.senderId === authUser._id && !msg.deletedForEveryone && !msg.isOptimistic && (
-                    <div className="absolute -top-3 -left-3 flex items-center gap-2">
+                    <div className="absolute right-3 -top-12 flex items-center gap-2 rounded-full border border-slate-700/70 bg-slate-950/90 px-2 py-1 opacity-0 translate-y-2 pointer-events-none transition-all duration-200 group-hover:translate-y-0 group-hover:opacity-100 group-hover:pointer-events-auto focus-within:translate-y-0 focus-within:opacity-100 focus-within:pointer-events-auto">
                       {!msg.image && !msg.video && !msg.audio && (
                         <button
                           type="button"
                           onClick={() => handleEditMessage(msg)}
-                          className="w-8 h-8 rounded-full bg-slate-950/80 border border-slate-700 text-slate-200 hover:text-cyan-300 transition-colors flex items-center justify-center"
+                          className="inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-xs font-medium text-slate-200 transition-colors hover:bg-cyan-500/15 hover:text-cyan-300"
                           title="Edit message"
                         >
                           <PencilIcon className="w-4 h-4" />
+                          <span>Edit</span>
                         </button>
                       )}
                       <button
                         type="button"
                         onClick={() => handleDeleteMessage(msg._id)}
-                        className="w-8 h-8 rounded-full bg-slate-950/80 border border-slate-700 text-slate-200 hover:text-red-400 transition-colors flex items-center justify-center"
+                        className="inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-xs font-medium text-slate-200 transition-colors hover:bg-red-500/15 hover:text-red-300"
                         title="Delete for everyone"
                       >
                         <Trash2Icon className="w-4 h-4" />
+                        <span>Delete</span>
                       </button>
                     </div>
                   )}
@@ -103,7 +105,7 @@ function ChatContainer() {
                       {msg.audio && (
                         <audio src={msg.audio} controls className="mt-2 max-w-full" />
                       )}
-                      {msg.text && <p className="mt-2">{msg.text}</p>}
+                      {msg.text && <p className="mt-2 break-words leading-relaxed">{msg.text}</p>}
                     </>
                   )}
                   <p className="text-xs mt-1 opacity-75 flex items-center gap-1">

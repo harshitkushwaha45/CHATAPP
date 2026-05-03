@@ -151,9 +151,9 @@ function MessageInput() {
   };
 
   return (
-    <div className="p-4 border-t border-slate-700/50">
+    <div className="p-4 xl:px-8 border-t border-slate-700/50 bg-slate-900/40">
       {mediaPreview && (
-        <div className="max-w-3xl mx-auto mb-3 flex items-center">
+        <div className="max-w-5xl mx-auto mb-3 flex items-center">
           <div className="relative">
             {mediaType === "video" ? (
               <video src={mediaPreview} className="w-28 h-20 object-cover rounded-lg border border-slate-700" controls />
@@ -176,7 +176,7 @@ function MessageInput() {
       )}
 
       {audioPreview && (
-        <div className="max-w-3xl mx-auto mb-3 flex items-center">
+        <div className="max-w-5xl mx-auto mb-3 flex items-center">
           <div className="relative rounded-lg border border-slate-700 bg-slate-800/70 p-3">
             <audio controls src={audioPreview} className="max-w-64" />
             <button
@@ -190,7 +190,7 @@ function MessageInput() {
         </div>
       )}
 
-      <form onSubmit={handleSendMessage} className="max-w-3xl mx-auto flex space-x-4">
+      <form onSubmit={handleSendMessage} className="max-w-5xl mx-auto flex space-x-4">
         <input
           type="text"
           value={text}
@@ -212,7 +212,7 @@ function MessageInput() {
             clearTypingTimeout();
             stopTyping();
           }}
-          className="flex-1 bg-slate-800/50 border border-slate-700/50 rounded-lg py-2 px-4"
+          className="flex-1 bg-slate-800/50 border border-slate-700/50 rounded-xl py-3 px-4 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/40"
           placeholder="Type your message..."
         />
 
@@ -227,7 +227,7 @@ function MessageInput() {
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className={`bg-slate-800/50 text-slate-400 hover:text-slate-200 rounded-lg px-4 transition-colors ${
+          className={`bg-slate-800/50 text-slate-400 hover:text-slate-200 rounded-xl px-4 transition-colors ${
             mediaPreview ? "text-cyan-500" : ""
           }`}
           title="Upload image or video"
@@ -237,7 +237,7 @@ function MessageInput() {
         <button
           type="button"
           onClick={toggleVoiceRecording}
-          className={`rounded-lg px-4 transition-colors ${
+          className={`rounded-xl px-4 transition-colors ${
             isRecording
               ? "bg-red-500/20 text-red-400 hover:text-red-300"
               : "bg-slate-800/50 text-slate-400 hover:text-slate-200"
@@ -249,7 +249,7 @@ function MessageInput() {
         <button
           type="submit"
           disabled={!text.trim() && !mediaPreview && !audioPreview}
-          className="bg-gradient-to-r from-cyan-500 to-cyan-600 text-white rounded-lg px-4 py-2 font-medium hover:from-cyan-600 hover:to-cyan-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="bg-gradient-to-r from-cyan-500 to-cyan-600 text-white rounded-xl px-4 py-3 font-medium hover:from-cyan-600 hover:to-cyan-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <SendIcon className="w-5 h-5" />
         </button>
