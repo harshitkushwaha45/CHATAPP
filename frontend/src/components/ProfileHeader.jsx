@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { LogOutIcon, VolumeOffIcon, Volume2Icon } from "lucide-react";
+import { LogOutIcon, Volume2Icon, VolumeOffIcon } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
 import { useChatStore } from "../store/useChatStore";
 
@@ -27,21 +27,23 @@ function ProfileHeader() {
   };
 
   return (
-    <div className="p-6 border-b border-slate-700/50">
-      <div className="flex items-center justify-between">
+    <div className="flex h-[106px] items-center border-b border-slate-200 bg-white px-6">
+      <div className="flex w-full items-center justify-between">
         <div className="flex items-center gap-3">
           {/* AVATAR */}
           <div className="avatar online">
             <button
-              className="size-14 rounded-full overflow-hidden relative group"
+              className="group relative size-12 overflow-hidden rounded-full ring-4 ring-[#eef4ff]"
               onClick={() => fileInputRef.current.click()}
+              type="button"
+              title="Change profile photo"
             >
               <img
                 src={selectedImg || authUser.profilePic || "/avatar.png"}
                 alt="User image"
                 className="size-full object-cover"
               />
-              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+              <div className="absolute inset-0 bg-slate-900/45 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
                 <span className="text-white text-xs">Change</span>
               </div>
             </button>
@@ -57,39 +59,46 @@ function ProfileHeader() {
 
           {/* USERNAME & ONLINE TEXT */}
           <div>
-            <h3 className="text-slate-200 font-medium text-base max-w-[180px] truncate">
+            <h3 className="max-w-[128px] truncate text-base font-medium text-[#111827] xl:max-w-[150px]">
               {authUser.fullName}
             </h3>
 
-            <p className="text-slate-400 text-xs">Online</p>
+            <p className="text-sm font-medium text-emerald-600">Online</p>
           </div>
         </div>
 
         {/* BUTTONS */}
-        <div className="flex gap-4 items-center">
-          {/* LOGOUT BTN */}
+        <div className="flex items-center gap-2">
           <button
-            className="text-slate-400 hover:text-slate-200 transition-colors"
-            onClick={logout}
-          >
-            <LogOutIcon className="size-5" />
-          </button>
-
-          {/* SOUND TOGGLE BTN */}
-          <button
-            className="text-slate-400 hover:text-slate-200 transition-colors"
+            className={`flex size-10 items-center justify-center rounded-lg border shadow-sm transition-colors ${
+              isSoundEnabled
+                ? "border-indigo-100 bg-indigo-50 text-indigo-600 hover:bg-indigo-100"
+                : "border-slate-200 bg-white text-slate-500 hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-600"
+            }`}
             onClick={() => {
-              // play click sound before toggling
-              mouseClickSound.currentTime = 0; // reset to start
+              mouseClickSound.currentTime = 0;
               mouseClickSound.play().catch((error) => console.log("Audio play failed:", error));
               toggleSound();
             }}
+            type="button"
+            title={isSoundEnabled ? "Typing sound on" : "Typing sound off"}
+            aria-label={isSoundEnabled ? "Turn typing sound off" : "Turn typing sound on"}
+            aria-pressed={isSoundEnabled}
           >
             {isSoundEnabled ? (
               <Volume2Icon className="size-5" />
             ) : (
               <VolumeOffIcon className="size-5" />
             )}
+          </button>
+
+          <button
+            className="flex size-10 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 shadow-sm transition-colors hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-600"
+            onClick={logout}
+            type="button"
+            title="Log out"
+          >
+            <LogOutIcon className="size-5" />
           </button>
         </div>
       </div>

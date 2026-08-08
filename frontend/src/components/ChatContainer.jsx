@@ -49,28 +49,31 @@ function ChatContainer() {
   return (
     <>
       <ChatHeader />
-      <div className="flex-1 px-6 xl:px-10 overflow-y-auto py-8 xl:py-10">
+      <div className="chat-conversation-surface flex-1 overflow-y-auto px-6 py-7 md:px-8 xl:px-10">
         {messages.length > 0 && !isMessagesLoading ? (
-          <div className="max-w-5xl mx-auto space-y-6">
-            {messages.map((msg) => (
+          <div className="mx-auto flex max-w-none flex-col gap-5">
+            {messages.map((msg) => {
+              const isOwnMessage = msg.senderId === authUser._id;
+
+              return (
               <div
                 key={msg._id}
-                className={`chat group ${msg.senderId === authUser._id ? "chat-end" : "chat-start"}`}
+                className={`group flex ${isOwnMessage ? "justify-end" : "justify-start"}`}
               >
                 <div
-                  className={`chat-bubble relative ${
-                    msg.senderId === authUser._id
-                      ? "bg-cyan-600 text-white shadow-[0_18px_40px_rgba(6,182,212,0.18)]"
-                      : "bg-slate-800 text-slate-200 shadow-[0_18px_36px_rgba(15,23,42,0.38)]"
+                  className={`relative max-w-[min(76%,22rem)] rounded-xl px-5 py-4 ${
+                    isOwnMessage
+                      ? "rounded-br-md bg-[linear-gradient(135deg,#3b82f6_0%,#7c5cff_100%)] text-white shadow-[0_10px_22px_rgba(59,130,246,0.18)]"
+                      : "rounded-bl-md border border-slate-200 bg-white text-[#111827] shadow-sm"
                   }`}
                 >
-                  {msg.senderId === authUser._id && !msg.deletedForEveryone && !msg.isOptimistic && (
-                    <div className="absolute right-3 -top-12 flex items-center gap-2 rounded-full border border-slate-700/70 bg-slate-950/90 px-2 py-1 opacity-0 translate-y-2 pointer-events-none transition-all duration-200 group-hover:translate-y-0 group-hover:opacity-100 group-hover:pointer-events-auto focus-within:translate-y-0 focus-within:opacity-100 focus-within:pointer-events-auto">
+                  {isOwnMessage && !msg.deletedForEveryone && !msg.isOptimistic && (
+                    <div className="pointer-events-none absolute right-3 -top-12 flex translate-y-2 items-center gap-2 rounded-full border border-slate-200 bg-white px-2 py-1 opacity-0 shadow-md transition-all duration-200 group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100 focus-within:pointer-events-auto focus-within:translate-y-0 focus-within:opacity-100">
                       {!msg.image && !msg.video && !msg.audio && (
                         <button
                           type="button"
                           onClick={() => handleEditMessage(msg)}
-                          className="inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-xs font-medium text-slate-200 transition-colors hover:bg-cyan-500/15 hover:text-cyan-300"
+                          className="inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-xs font-medium text-slate-600 transition-colors hover:bg-blue-50 hover:text-blue-600"
                           title="Edit message"
                         >
                           <PencilIcon className="w-4 h-4" />
@@ -80,7 +83,7 @@ function ChatContainer() {
                       <button
                         type="button"
                         onClick={() => handleDeleteMessage(msg._id)}
-                        className="inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-xs font-medium text-slate-200 transition-colors hover:bg-red-500/15 hover:text-red-300"
+                        className="inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-xs font-medium text-slate-600 transition-colors hover:bg-red-50 hover:text-red-600"
                         title="Delete for everyone"
                       >
                         <Trash2Icon className="w-4 h-4" />
@@ -89,41 +92,44 @@ function ChatContainer() {
                     </div>
                   )}
                   {msg.deletedForEveryone ? (
-                    <p className="mt-1 italic opacity-80">{msg.deletedLabel}</p>
+                    <p className="italic opacity-80">{msg.deletedLabel}</p>
                   ) : (
                     <>
                       {msg.image && (
-                        <img src={msg.image} alt="Shared" className="rounded-lg h-48 object-cover" />
+                        <img src={msg.image} alt="Shared" className="mb-2 h-48 rounded-xl object-cover" />
                       )}
                       {msg.video && (
                         <video
                           src={msg.video}
                           controls
-                          className="rounded-lg max-h-72 w-full bg-black"
+                          className="mb-2 max-h-72 w-full rounded-xl bg-black"
                         />
                       )}
                       {msg.audio && (
                         <audio src={msg.audio} controls className="mt-2 max-w-full" />
                       )}
-                      {msg.text && <p className="mt-2 break-words leading-relaxed">{msg.text}</p>}
+                      {msg.text && <p className="break-words text-sm font-semibold leading-relaxed">{msg.text}</p>}
                     </>
                   )}
-                  <p className="text-xs mt-1 opacity-75 flex items-center gap-1">
+                  <p
+                    className={`mt-2 flex items-center gap-3 text-xs font-normal ${
+                      isOwnMessage ? "text-white/85" : "text-slate-600"
+                    }`}
+                  >
                     {new Date(msg.createdAt).toLocaleTimeString(undefined, {
                       hour: "2-digit",
                       minute: "2-digit",
                     })}
                     {msg.edited && !msg.deletedForEveryone && <span className="ml-2">(edited)</span>}
-                    {msg.senderId === authUser._id &&
-                      !msg.isOptimistic &&
-                      !msg.deletedForEveryone && (
+                    {isOwnMessage && !msg.isOptimistic && !msg.deletedForEveryone && (
                       <span className="ml-2">{msg.seen ? "Seen" : "Sent"}</span>
                     )}
                   </p>
                 </div>
               </div>
-            ))}
-            {/* 👇 scroll target */}
+              );
+            })}
+            {/* scroll target */}
             <div ref={messageEndRef} />
           </div>
         ) : isMessagesLoading ? (

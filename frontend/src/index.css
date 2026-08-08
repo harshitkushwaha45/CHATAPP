@@ -2,6 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
 @property --border-angle {
   inherits: false;
   initial-value: 0deg;
@@ -32,4 +44,96 @@
 .auth-link {
   @apply px-4 py-2 inline-block bg-cyan-500/10 rounded-lg text-cyan-400
   hover:text-cyan-500 text-sm transition-colors;
+}
+
+.auth-light-input,
+.chat-message-input {
+  caret-color: #071334;
+}
+
+.auth-light-input::selection,
+.chat-message-input::selection {
+  background: #dbeafe;
+  color: #071334;
+}
+
+.auth-light-input:-webkit-autofill,
+.auth-light-input:-webkit-autofill:hover,
+.auth-light-input:-webkit-autofill:focus,
+.chat-message-input:-webkit-autofill,
+.chat-message-input:-webkit-autofill:hover,
+.chat-message-input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #071334;
+  box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.92) inset;
+  caret-color: #071334;
+}
+
+.chat-app-shell .bg-slate-950,
+.chat-app-shell .bg-slate-950\/90,
+.chat-app-shell .bg-slate-900,
+.chat-app-shell .bg-slate-900\/80,
+.chat-app-shell .bg-slate-900\/60,
+.chat-app-shell .bg-slate-900\/50,
+.chat-app-shell .bg-slate-900\/40,
+.chat-app-shell .bg-slate-800,
+.chat-app-shell .bg-slate-800\/70,
+.chat-app-shell .bg-slate-800\/50,
+.chat-app-shell .bg-slate-800\/30,
+.chat-app-shell .bg-slate-800\/20 {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.chat-app-shell .border-slate-700,
+.chat-app-shell .border-slate-700\/70,
+.chat-app-shell .border-slate-700\/50,
+.chat-app-shell .border-slate-600,
+.chat-app-shell .border-slate-600\/30 {
+  border-color: rgba(191, 219, 254, 0.9) !important;
+}
+
+.chat-app-shell .text-slate-100,
+.chat-app-shell .text-slate-200,
+.chat-app-shell .text-slate-300 {
+  color: #071334 !important;
+}
+
+.chat-app-shell .text-slate-400,
+.chat-app-shell .text-slate-500,
+.chat-app-shell .text-slate-600 {
+  color: #475569 !important;
+}
+
+.chat-app-shell .text-cyan-300,
+.chat-app-shell .text-cyan-400,
+.chat-app-shell .text-cyan-500 {
+  color: #2563eb !important;
+}
+
+.chat-app-shell .bg-cyan-500,
+.chat-app-shell .bg-cyan-600 {
+  background-color: #2563eb !important;
+}
+
+.chat-app-shell .ring-cyan-400\/50 {
+  --tw-ring-color: rgba(147, 197, 253, 0.7) !important;
+}
+
+.chat-conversation-surface {
+  background: linear-gradient(180deg, #fbfdff 0%, #f7f9fd 100%);
+  background-color: #f7f9fd;
+}
+
+.chat-app-shell ::-webkit-scrollbar {
+  width: 10px;
+}
+
+.chat-app-shell ::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.24);
+  border: 3px solid transparent;
+  border-radius: 999px;
+  background-clip: content-box;
+}
+
+.chat-app-shell ::-webkit-scrollbar-track {
+  background: transparent;
 }

@@ -151,22 +151,22 @@ function MessageInput() {
   };
 
   return (
-    <div className="p-4 xl:px-8 border-t border-slate-700/50 bg-slate-900/40">
+    <div className="border-t border-slate-200 bg-white px-6 py-4 xl:px-8">
       {mediaPreview && (
-        <div className="max-w-5xl mx-auto mb-3 flex items-center">
+        <div className="mx-auto mb-3 flex max-w-none items-center">
           <div className="relative">
             {mediaType === "video" ? (
-              <video src={mediaPreview} className="w-28 h-20 object-cover rounded-lg border border-slate-700" controls />
+              <video src={mediaPreview} className="h-20 w-28 rounded-xl border border-slate-200 object-cover" controls />
             ) : (
               <img
                 src={mediaPreview}
                 alt="Preview"
-                className="w-20 h-20 object-cover rounded-lg border border-slate-700"
+                className="h-20 w-20 rounded-xl border border-slate-200 object-cover"
               />
             )}
             <button
               onClick={removeMedia}
-              className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-slate-800 flex items-center justify-center text-slate-200 hover:bg-slate-700"
+              className="absolute -right-2 -top-2 flex size-6 items-center justify-center rounded-full bg-blue-600 text-white hover:bg-blue-700"
               type="button"
             >
               <XIcon className="w-4 h-4" />
@@ -176,12 +176,12 @@ function MessageInput() {
       )}
 
       {audioPreview && (
-        <div className="max-w-5xl mx-auto mb-3 flex items-center">
-          <div className="relative rounded-lg border border-slate-700 bg-slate-800/70 p-3">
+        <div className="mx-auto mb-3 flex max-w-none items-center">
+          <div className="relative rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
             <audio controls src={audioPreview} className="max-w-64" />
             <button
               onClick={removeAudio}
-              className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-slate-800 flex items-center justify-center text-slate-200 hover:bg-slate-700"
+              className="absolute -right-2 -top-2 flex size-6 items-center justify-center rounded-full bg-blue-600 text-white hover:bg-blue-700"
               type="button"
             >
               <XIcon className="w-4 h-4" />
@@ -190,7 +190,7 @@ function MessageInput() {
         </div>
       )}
 
-      <form onSubmit={handleSendMessage} className="max-w-5xl mx-auto flex space-x-4">
+      <form onSubmit={handleSendMessage} className="mx-auto flex max-w-none gap-4">
         <input
           type="text"
           value={text}
@@ -212,7 +212,7 @@ function MessageInput() {
             clearTypingTimeout();
             stopTyping();
           }}
-          className="flex-1 bg-slate-800/50 border border-slate-700/50 rounded-xl py-3 px-4 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/40"
+className="chat-message-input h-14 min-w-0 flex-1 rounded-xl border border-slate-200 bg-white px-5 text-[15px] font-normal text-[#111827] shadow-sm placeholder:text-slate-500 focus:border-indigo-300 focus:outline-none focus:ring-4 focus:ring-indigo-50"
           placeholder="Type your message..."
         />
 
@@ -227,8 +227,8 @@ function MessageInput() {
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className={`bg-slate-800/50 text-slate-400 hover:text-slate-200 rounded-xl px-4 transition-colors ${
-            mediaPreview ? "text-cyan-500" : ""
+          className={`flex size-14 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-[#f8faff] text-blue-600 shadow-sm transition-colors hover:border-indigo-200 hover:bg-indigo-50 ${
+            mediaPreview ? "text-blue-600" : ""
           }`}
           title="Upload image or video"
         >
@@ -237,10 +237,10 @@ function MessageInput() {
         <button
           type="button"
           onClick={toggleVoiceRecording}
-          className={`rounded-xl px-4 transition-colors ${
+          className={`flex size-14 shrink-0 items-center justify-center rounded-2xl transition-colors ${
             isRecording
-              ? "bg-red-500/20 text-red-400 hover:text-red-300"
-              : "bg-slate-800/50 text-slate-400 hover:text-slate-200"
+              ? "border border-red-100 bg-red-50 text-red-500 hover:bg-red-100"
+              : "border border-slate-200 bg-[#f8faff] text-blue-600 shadow-sm hover:border-indigo-200 hover:bg-indigo-50"
           }`}
           title={isRecording ? "Stop recording" : "Record voice message"}
         >
@@ -249,7 +249,7 @@ function MessageInput() {
         <button
           type="submit"
           disabled={!text.trim() && !mediaPreview && !audioPreview}
-          className="bg-gradient-to-r from-cyan-500 to-cyan-600 text-white rounded-xl px-4 py-3 font-medium hover:from-cyan-600 hover:to-cyan-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex size-14 shrink-0 items-center justify-center rounded-xl bg-[linear-gradient(135deg,#3b82f6_0%,#7c5cff_100%)] text-white shadow-[0_8px_18px_rgba(59,130,246,0.20)] transition-all hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50"
         >
           <SendIcon className="w-5 h-5" />
         </button>

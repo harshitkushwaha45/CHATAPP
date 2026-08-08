@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { useChatStore } from "../store/useChatStore";
 import { useAuthStore } from "../store/useAuthStore";
 
-import BorderAnimatedContainer from "../components/BorderAnimatedContainer";
 import ProfileHeader from "../components/ProfileHeader";
 import ActiveTabSwitch from "../components/ActiveTabSwitch";
 import ChatsList from "../components/ChatsList";
@@ -24,24 +23,20 @@ function ChatPage() {
   }, [socket, subscribeToMessages, unsubscribeFromMessages]);
 
   return (
-    <div className="relative w-full max-w-[1500px] h-[calc(100vh-2rem)] min-h-[720px]">
-      <BorderAnimatedContainer>
-        {/* LEFT SIDE */}
-        <div className="w-80 xl:w-96 bg-slate-800/55 backdrop-blur-sm flex flex-col border-r border-slate-700/40">
-          <ProfileHeader />
-          <ActiveTabSwitch />
+    <main className="relative z-10 flex h-[calc(100vh-2rem)] min-h-[640px] w-full max-w-[1480px] overflow-hidden rounded-[20px] border border-slate-200 bg-white shadow-[0_18px_48px_rgba(59,76,113,0.12)] max-md:flex-col">
+      <aside className="flex w-full shrink-0 flex-col overflow-hidden border-r border-slate-200 bg-white md:w-[360px] xl:w-[400px]">
+        <ProfileHeader />
+        <ActiveTabSwitch />
 
-          <div className="flex-1 overflow-y-auto p-4 space-y-2">
-            {activeTab === "chats" ? <ChatsList /> : <ContactList />}
-          </div>
+        <div className="flex-1 space-y-2 overflow-y-auto bg-white px-3 py-4">
+          {activeTab === "chats" ? <ChatsList /> : <ContactList />}
         </div>
+      </aside>
 
-        {/* RIGHT SIDE */}
-        <div className="flex-1 flex flex-col bg-slate-900/55 backdrop-blur-sm">
-          {selectedUser ? <ChatContainer /> : <NoConversationPlaceholder />}
-        </div>
-      </BorderAnimatedContainer>
-    </div>
+      <section className="flex min-w-0 flex-1 flex-col overflow-hidden bg-[#f7f9fd]">
+        {selectedUser ? <ChatContainer /> : <NoConversationPlaceholder />}
+      </section>
+    </main>
   );
 }
 export default ChatPage;

@@ -2,12 +2,12 @@ function UsersLoadingSkeleton() {
   return (
     <div className="space-y-2">
       {[1, 2, 3].map((item) => (
-        <div key={item} className="bg-slate-800/30 p-4 rounded-lg animate-pulse">
+        <div key={item} className="animate-pulse rounded-lg border border-slate-100 bg-[#f8faff] p-4">
           <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 bg-slate-700 rounded-full"></div>
+            <div className="h-12 w-12 rounded-full bg-slate-200"></div>
             <div className="flex-1">
-              <div className="h-4 bg-slate-700 rounded w-3/4 mb-2"></div>
-              <div className="h-3 bg-slate-700/70 rounded w-1/2"></div>
+              <div className="mb-2 h-4 w-3/4 rounded bg-slate-200"></div>
+              <div className="h-3 w-1/2 rounded bg-slate-100"></div>
             </div>
           </div>
         </div>

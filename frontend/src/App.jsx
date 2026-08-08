@@ -18,11 +18,10 @@ function App() {
   if (isCheckingAuth) return <PageLoader />;
 
   return (
-    <div className="min-h-screen bg-slate-900 relative flex items-center justify-center p-2 sm:p-4 overflow-hidden">
-      {/* DECORATORS - GRID BG & GLOW SHAPES */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px]" />
-      <div className="absolute top-0 -left-4 size-96 bg-pink-500 opacity-20 blur-[100px]" />
-      <div className="absolute bottom-0 -right-4 size-96 bg-cyan-500 opacity-20 blur-[100px]" />
+    <div className="chat-app-shell relative flex min-h-screen items-center justify-center overflow-hidden bg-[#f4f7fb] px-3 py-4 sm:px-6">
+      <div className="absolute inset-0 bg-[linear-gradient(135deg,#ffffff_0%,#f3f7ff_54%,#f7f3ff_100%)]" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-44 bg-[linear-gradient(180deg,rgba(255,255,255,0.78)_0%,rgba(255,255,255,0)_100%)]" />
+      <div className="pointer-events-none absolute bottom-0 left-0 h-44 w-[42rem] opacity-10 [background-image:radial-gradient(#8ea3c1_1px,transparent_1px)] [background-size:14px_14px] [mask-image:linear-gradient(90deg,#000_0%,transparent_88%)]" />
 
       <Routes>
         <Route path="/" element={authUser ? <ChatPage /> : <Navigate to={"/login"} />} />
