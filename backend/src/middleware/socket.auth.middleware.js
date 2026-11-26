@@ -34,19 +34,9 @@ export const socketAuthMiddleware = async (socket, next) => {
       return next(new Error("Unauthorized - Invalid Token"));
     }
 
-    // ✅ 4. Get user from DB
-    const user = await User.findById(decoded.userId).select("-password");
-
-    if (!user) {
-      console.log("❌ User not found");
-      return next(new Error("Unauthorized - User not found"));
-    }
-
-    // ✅ 5. Attach user to socket
-    socket.user = user;
-    socket.userId = user._id.toString();
-
-    console.log(`✅ Socket connected: ${user.fullName}`);
+    // Attach user identifier to socket without blocking MongoDB query on every handshake
+    socket.userId = decoded.userId.toString();
+    socket.user = { _id: decoded.userId };
 
     next();
   } catch (error) {

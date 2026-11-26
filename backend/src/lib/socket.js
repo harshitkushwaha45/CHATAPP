@@ -17,31 +17,47 @@ const io = new Server(server, {
 // apply authentication middleware to all socket connections
 io.use(socketAuthMiddleware);
 
-// we will use this function to check if the user is online or not
+// Map to track user's active sockets: userId -> Set<socketId> (supports multi-tab & multi-device)
+const userSocketMap = new Map();
+
+// Returns socket ID(s) for a given userId
 export function getReceiverSocketId(userId) {
-  return userSocketMap[userId];
+  if (!userId) return null;
+  const sockets = userSocketMap.get(userId.toString());
+  if (!sockets || sockets.size === 0) return null;
+  return Array.from(sockets);
 }
 
-// this is for storig online users
-const userSocketMap = {}; // {userId:socketId}
-
 io.on("connection", (socket) => {
-  console.log("A user connected", socket.user.fullName);
-
   const userId = socket.userId;
-  userSocketMap[userId] = socket.id;
+  if (!userId) return;
 
-  // io.emit() is used to send events to all connected clients
-  io.emit("getOnlineUsers", Object.keys(userSocketMap));
+  const isFirstConnectionForUser = !userSocketMap.has(userId) || userSocketMap.get(userId).size === 0;
+
+  if (!userSocketMap.has(userId)) {
+    userSocketMap.set(userId, new Set());
+  }
+  userSocketMap.get(userId).add(socket.id);
+
+  // Automatically join personal room for multi-device/multi-tab delivery
+  socket.join(userId);
+
+  // Only broadcast online user list when a user transitions from offline to online
+  if (isFirstConnectionForUser) {
+    io.emit("getOnlineUsers", Array.from(userSocketMap.keys()));
+  } else {
+    // Deliver current list directly to newly opened tab
+    socket.emit("getOnlineUsers", Array.from(userSocketMap.keys()));
+  }
 
   // with socket.on we listen for events from clients
   socket.on("typing:start", ({ receiverId } = {}) => {
     if (!receiverId || receiverId === userId) return;
 
-    const receiverSocketId = getReceiverSocketId(receiverId);
-    if (!receiverSocketId) return;
+    const receiverSocketIds = getReceiverSocketId(receiverId);
+    if (!receiverSocketIds) return;
 
-    io.to(receiverSocketId).emit("typing:start", {
+    io.to(receiverSocketIds).emit("typing:start", {
       senderId: userId,
     });
   });
@@ -49,18 +65,23 @@ io.on("connection", (socket) => {
   socket.on("typing:stop", ({ receiverId } = {}) => {
     if (!receiverId || receiverId === userId) return;
 
-    const receiverSocketId = getReceiverSocketId(receiverId);
-    if (!receiverSocketId) return;
+    const receiverSocketIds = getReceiverSocketId(receiverId);
+    if (!receiverSocketIds) return;
 
-    io.to(receiverSocketId).emit("typing:stop", {
+    io.to(receiverSocketIds).emit("typing:stop", {
       senderId: userId,
     });
   });
 
   socket.on("disconnect", () => {
-    console.log("A user disconnected", socket.user.fullName);
-    delete userSocketMap[userId];
-    io.emit("getOnlineUsers", Object.keys(userSocketMap));
+    const userSockets = userSocketMap.get(userId);
+    if (userSockets) {
+      userSockets.delete(socket.id);
+      if (userSockets.size === 0) {
+        userSocketMap.delete(userId);
+        io.emit("getOnlineUsers", Array.from(userSocketMap.keys()));
+      }
+    }
   });
 });
 
