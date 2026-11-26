@@ -70,7 +70,10 @@ export const useAuthStore = create((set, get) => ({
 
       toast.success("Account created successfully!");
     } catch (error) {
-      toast.error(error.response?.data?.message || "Signup failed");
+      toast.error(
+        error.response?.data?.message ||
+          (!error.response ? "Unable to reach the server. Please try again." : "Signup failed")
+      );
     } finally {
       set({ isSigningUp: false });
     }
@@ -90,7 +93,10 @@ export const useAuthStore = create((set, get) => ({
 
       toast.success("Logged in successfully");
     } catch (error) {
-      toast.error(error.response?.data?.message || "Login failed");
+      toast.error(
+        error.response?.data?.message ||
+          (!error.response ? "Unable to reach the server. Please try again." : "Login failed")
+      );
     } finally {
       set({ isLoggingIn: false });
     }

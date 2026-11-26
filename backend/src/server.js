@@ -8,7 +8,7 @@ import cors from "cors";
 import authRoutes from "./routes/auth.route.js";
 import messageRoutes from "./routes/message.route.js";
 import { connectDB } from "./lib/db.js";
-import { ENV } from "./lib/env.js";
+import { corsOriginCallback, ENV } from "./lib/env.js";
 import { app, server } from "./lib/socket.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -23,7 +23,7 @@ const PORT = ENV.PORT || 3000;
 app.use(express.json({ limit: "5mb" })); // req.body
 app.use(
   cors({
-    origin: ENV.CLIENT_URLS,
+    origin: corsOriginCallback,
     credentials: true,
   })
 );

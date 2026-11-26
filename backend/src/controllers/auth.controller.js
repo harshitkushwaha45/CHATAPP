@@ -7,9 +7,11 @@ import cloudinary from "../lib/cloudinary.js";
 
 export const signup = async (req, res) => {
   const { fullName, email, password } = req.body;
+  const trimmedFullName = fullName?.trim();
+  const normalizedEmail = email?.trim().toLowerCase();
 
   try {
-    if (!fullName || !email || !password) {
+    if (!trimmedFullName || !normalizedEmail || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -19,11 +21,11 @@ export const signup = async (req, res) => {
 
     // check if emailis valid: regex
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    if (!emailRegex.test(normalizedEmail)) {
       return res.status(400).json({ message: "Invalid email format" });
     }
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: normalizedEmail });
     if (user) return res.status(400).json({ message: "Email already exists" });
 
     // 123456 => $dnjasdkasj_?dmsakmk
@@ -31,8 +33,8 @@ export const signup = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     const newUser = new User({
-      fullName,
-      email,
+      fullName: trimmedFullName,
+      email: normalizedEmail,
       password: hashedPassword,
     });
 
@@ -70,13 +72,17 @@ export const signup = async (req, res) => {
 
 export const login = async (req, res) => {
   const { email, password } = req.body;
+  const trimmedEmail = email?.trim();
+  const normalizedEmail = trimmedEmail?.toLowerCase();
 
-  if (!email || !password) {
+  if (!trimmedEmail || !password) {
     return res.status(400).json({ message: "Email and password are required" });
   }
 
   try {
-    const user = await User.findOne({ email });
+    const user =
+      (await User.findOne({ email: normalizedEmail })) ||
+      (trimmedEmail !== normalizedEmail ? await User.findOne({ email: trimmedEmail }) : null);
     if (!user) return res.status(400).json({ message: "Invalid credentials" });
     // never tell the client which one is incorrect: password or email
 
